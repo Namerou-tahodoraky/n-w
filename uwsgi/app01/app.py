@@ -4,10 +4,39 @@ app = Flask(__name__)
 import os
 root_path = "/" + os.environ.get("HOSTNAME", "app")
 
+# from queue import Queue
+import queue
+max_size = 3000
+q = queue.Queue(maxsize=max_size)
+
 # @app.route("/uwsgi01")
 @app.route(root_path)
 def hello():
     return "Hello 01"
+
+@app.route(root_path + "/put", methods=["PUT"])
+def put_s3path():
+    # if q.full():
+    #     raise
+    try:
+        q.put(s3path, block==True, timeout=60)
+    except queue.Full as e:
+        print(e)
+    except Exception as e:
+        # 予期せぬエラー
+    print(f"put: qsize={q.qsize()}")
+    return {}
+
+@app.route(root_path + "/get", methods=["GET"])
+def get_s3path():
+    try:
+        s3path = q.get(s3path, block==True, timeout=60)
+    except queue.Empty as e:
+        print(e)
+    except Exception as e:
+        # 予期せぬエラー
+    print(f"get: qsize={q.qsize()}")
+    return {}
 # 
 # @app.route('/', methods=['POST'])
 # def post_json():
@@ -39,5 +68,7 @@ def hello():
 #    return jsonify(det_results)
 
 
-if __name__ == "__main__":
-    app.run()
+#if __name__ == "__main__":
+#    print("++++++++++++bbbbbbbbbbbb+++++++++++++++++++++++++++++++++++++++++++++++++++++")
+#    app2.run()
+#    print("++++++++++++aaaaaaaaaaaa+++++++++++++++++++++++++++++++++++++++++++++++++++++")
