@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  proxy:
+    image: nginx
+    container_name: proxy
+    hostname: proxy
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+  uwsgi01:
+    image: uwsgi:0.1
+    container_name: uwsgi01
+    hostname: uwsgi01
+    volumes:
+      - ./uwsgi/app01:/app
+    command: uwsgi --ini /app/myapp.ini
+  uwsgi02:
+    image: uwsgi:0.1
+    container_name: uwsgi02
+    hostname: uwsgi02
+    volumes:
+      - ./uwsgi/app02:/app
+    command: uwsgi --ini /app/myapp.ini
+  client:
+    image: python:3.9-buster
+    container_name: client
+    hostname: client
+    tty: true
+    command: bash
+
